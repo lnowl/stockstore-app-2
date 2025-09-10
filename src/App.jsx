@@ -1,7 +1,8 @@
 import React, { useState, useMemo } from 'react';
 import { FaBoxOpen, FaWarehouse, FaExclamationTriangle, FaMoneyBillWave, FaShoppingCart, FaTrash } from 'react-icons/fa';
 import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
+import 'jspdf-autotable';
+
 
 const SAMPLE_PRODUCTS = [
   { id: 1, name: 'ท่อเหล็กกลม 3/4"', category: 'Steel', sku: 'ST-074', price: 420, stock: 120, unit: 'ชิ้น', supplier: 'ABC Steel Co.' },
@@ -308,5 +309,6 @@ export default function StockStoreApp() {
     </div>
   );
 }
+
 
 
