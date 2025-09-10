@@ -214,7 +214,6 @@ export default function StockStoreApp() {
               <p className="text-gray-400 text-sm">ผู้จัดหา: {p.supplier}</p>
 
               <div className="flex gap-2 mt-2">
-                <button onClick={() => addToCart(p)} className="px-2 py-
                 <button onClick={() => addToCart(p)} className="px-2 py-1 bg-purple-600 text-white rounded text-sm hover:bg-purple-500 transition">เพิ่มไปใบเสนอราคา</button>
                 <button onClick={() => handleEditProduct(p)} className="px-2 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-500 transition">แก้ไข</button>
                 <button onClick={() => handleDeleteProduct(p.id)} className="px-2 py-1 bg-red-600 text-white rounded text-sm hover:bg-red-500 transition">ลบ</button>
