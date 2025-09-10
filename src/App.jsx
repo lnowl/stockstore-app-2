@@ -271,13 +271,79 @@ export default function StockStoreApp() {
           </div>
         )}
 
-        {/* Admin Form Modal */}
-        {showAdmin && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="p-6 rounded shadow-lg w-full max-w-md" style={{ backgroundColor: '#0D1117' }}>
-              <h2 className="text-xl font-bold mb-4 text-white">{editingProduct ? 'แก้ไขสินค้า' : 'เพิ่มสินค้าใหม่'}</h2>
-              <form onSubmit={handleAddOrUpdateProduct} className="flex flex-col gap-3">
-                <input required placeholder="ชื่อสินค้า" value={newProduct.name} onChange={e => setNewProduct({ ...newProduct, name: e.target.value })} className="p-2 rounded bg-gray-800 text-white" style={{ backgroundColor: '#151B23' }} />
-                <input required placeholder="หมวดหมู่" value={newProduct.category} onChange={e => setNewProduct({ ...newProduct, category: e.target.value })} className="p-2 rounded bg-gray-800 text-white" style={{ backgroundColor: '#151B23' }} />
-                <input required placeholder="SKU" value={newProduct.sku} onChange={e => setNewProduct({ ...newProduct, sku: e.target.value })} className="p-2 rounded bg-gray-800 text-white" style={{ backgroundColor: '#151B23' }} />
-                <input required placeholder="ราคา" type="number" value
+       {/* Admin Form Modal */}
+{showAdmin && (
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="p-6 rounded shadow-lg w-full max-w-md" style={{ backgroundColor: '#0D1117' }}>
+      <h2 className="text-xl font-bold mb-4 text-white">{editingProduct ? 'แก้ไขสินค้า' : 'เพิ่มสินค้าใหม่'}</h2>
+      <form onSubmit={handleAddOrUpdateProduct} className="flex flex-col gap-3">
+        <input
+          required
+          placeholder="ชื่อสินค้า"
+          value={newProduct.name}
+          onChange={e => setNewProduct({ ...newProduct, name: e.target.value })}
+          className="p-2 rounded bg-gray-800 text-white"
+          style={{ backgroundColor: '#151B23' }}
+        />
+        <input
+          required
+          placeholder="หมวดหมู่"
+          value={newProduct.category}
+          onChange={e => setNewProduct({ ...newProduct, category: e.target.value })}
+          className="p-2 rounded bg-gray-800 text-white"
+          style={{ backgroundColor: '#151B23' }}
+        />
+        <input
+          required
+          placeholder="SKU"
+          value={newProduct.sku}
+          onChange={e => setNewProduct({ ...newProduct, sku: e.target.value })}
+          className="p-2 rounded bg-gray-800 text-white"
+          style={{ backgroundColor: '#151B23' }}
+        />
+        <input
+          required
+          placeholder="ราคา"
+          type="number"
+          value={newProduct.price}
+          onChange={e => setNewProduct({ ...newProduct, price: e.target.value })}
+          className="p-2 rounded bg-gray-800 text-white"
+          style={{ backgroundColor: '#151B23' }}
+        />
+        <input
+          required
+          placeholder="จำนวนคงเหลือ"
+          type="number"
+          value={newProduct.stock}
+          onChange={e => setNewProduct({ ...newProduct, stock: e.target.value })}
+          className="p-2 rounded bg-gray-800 text-white"
+          style={{ backgroundColor: '#151B23' }}
+        />
+        <input
+          required
+          placeholder="หน่วย"
+          value={newProduct.unit}
+          onChange={e => setNewProduct({ ...newProduct, unit: e.target.value })}
+          className="p-2 rounded bg-gray-800 text-white"
+          style={{ backgroundColor: '#151B23' }}
+        />
+        <input
+          placeholder="ผู้จัดหา"
+          value={newProduct.supplier}
+          onChange={e => setNewProduct({ ...newProduct, supplier: e.target.value })}
+          className="p-2 rounded bg-gray-800 text-white"
+          style={{ backgroundColor: '#151B23' }}
+        />
+
+        <div className="flex gap-2 mt-2">
+          <button type="submit" className="px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-500 transition">
+            {editingProduct ? 'บันทึกการแก้ไข' : 'เพิ่มสินค้า'}
+          </button>
+          <button type="button" onClick={handleCancelAdmin} className="px-3 py-2 bg-gray-600 text-white rounded hover:bg-gray-500 transition">
+            ยกเลิก
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+)}
