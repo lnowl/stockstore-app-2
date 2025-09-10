@@ -1,5 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { FaBoxOpen, FaWarehouse, FaExclamationTriangle, FaMoneyBillWave, FaShoppingCart, FaTrash } from 'react-icons/fa';
+import jsPDF from "jspdf";
+import "jspdf-autotable";
 
 const SAMPLE_PRODUCTS = [
   { id: 1, name: 'ท่อเหล็กกลม 3/4"', category: 'Steel', sku: 'ST-074', price: 420, stock: 120, unit: 'ชิ้น', supplier: 'ABC Steel Co.' },
@@ -49,17 +51,47 @@ export default function StockStoreApp() {
   }
 
   function exportQuotation() {
-    const header = ['ชื่อสินค้า', 'SKU', 'จำนวน', 'หน่วย', 'ราคาต่อหน่วย', 'รวม'];
-    const rows = cart.map(c => [c.name, c.sku, c.qty, c.unit, c.price, c.price * c.qty]);
-    const csv = [header, ...rows].map(r => r.join(",")).join("\n");
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'quotation.csv';
-    a.click();
-    URL.revokeObjectURL(url);
+  if (cart.length === 0) {
+    alert('ไม่มีสินค้าในตะกร้า');
+    return;
   }
+
+  const doc = new jsPDF();
+
+  // Header
+  doc.setFontSize(18);
+  doc.text('ใบเสนอราคา', 14, 20);
+  doc.setFontSize(12);
+  doc.text(`วันที่: ${new Date().toLocaleDateString()}`, 14, 28);
+  doc.text(`รวมทั้งหมด: ${cartTotal.toLocaleString()} บาท`, 14, 36);
+
+  // Table
+  const tableColumn = ["สินค้า", "SKU", "จำนวน", "หน่วย", "ราคาต่อหน่วย", "รวม"];
+  const tableRows = [];
+
+  cart.forEach(item => {
+    const row = [
+      item.name,
+      item.sku,
+      item.qty,
+      item.unit,
+      item.price.toLocaleString(),
+      (item.price * item.qty).toLocaleString()
+    ];
+    tableRows.push(row);
+  });
+
+  doc.autoTable({
+    startY: 45,
+    head: [tableColumn],
+    body: tableRows,
+    theme: 'grid',
+    headStyles: { fillColor: [54, 57, 63], textColor: 255 },
+    bodyStyles: { textColor: 0 },
+  });
+
+  doc.save(`quotation_${new Date().getTime()}.pdf`);
+}
 
   function resetAdminForm() {
     setNewProduct({ name: '', category: '', sku: '', price: '', stock: '', unit: '', supplier: '' });
@@ -280,3 +312,4 @@ export default function StockStoreApp() {
     </div>
   );
 }
+
