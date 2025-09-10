@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { FaBoxOpen, FaWarehouse, FaExclamationTriangle, FaMoneyBillWave, FaShoppingCart, FaTrash } from 'react-icons/fa';
-import jsPDF from "jspdf";
-import "jspdf-autotable";
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 const SAMPLE_PRODUCTS = [
   { id: 1, name: 'ท่อเหล็กกลม 3/4"', category: 'Steel', sku: 'ST-074', price: 420, stock: 120, unit: 'ชิ้น', supplier: 'ABC Steel Co.' },
@@ -50,48 +50,44 @@ export default function StockStoreApp() {
     setCart(prev => prev.filter(i => i.id !== id));
   }
 
-  function exportQuotation() {
-  if (cart.length === 0) {
-    alert('ไม่มีสินค้าในตะกร้า');
-    return;
-  }
+  async function exportQuotation() {
+  if (cart.length === 0) return alert('ไม่มีสินค้าในตะกร้า');
+
+  // dynamic import เพื่อให้ Vite build ผ่าน
+  const { jsPDF } = await import('jspdf');
+  await import('jspdf-autotable');
 
   const doc = new jsPDF();
-
-  // Header
   doc.setFontSize(18);
   doc.text('ใบเสนอราคา', 14, 20);
-  doc.setFontSize(12);
-  doc.text(`วันที่: ${new Date().toLocaleDateString()}`, 14, 28);
-  doc.text(`รวมทั้งหมด: ${cartTotal.toLocaleString()} บาท`, 14, 36);
 
-  // Table
-  const tableColumn = ["สินค้า", "SKU", "จำนวน", "หน่วย", "ราคาต่อหน่วย", "รวม"];
-  const tableRows = [];
-
-  cart.forEach(item => {
-    const row = [
-      item.name,
-      item.sku,
-      item.qty,
-      item.unit,
-      item.price.toLocaleString(),
-      (item.price * item.qty).toLocaleString()
-    ];
-    tableRows.push(row);
-  });
+  // เตรียม data สำหรับ table
+  const tableColumn = ['สินค้า', 'SKU', 'จำนวน', 'หน่วย', 'ราคา/หน่วย', 'รวม'];
+  const tableRows = cart.map(c => [
+    c.name,
+    c.sku,
+    c.qty,
+    c.unit,
+    c.price.toLocaleString(),
+    (c.price * c.qty).toLocaleString()
+  ]);
 
   doc.autoTable({
-    startY: 45,
+    startY: 30,
     head: [tableColumn],
     body: tableRows,
-    theme: 'grid',
-    headStyles: { fillColor: [54, 57, 63], textColor: 255 },
-    bodyStyles: { textColor: 0 },
+    theme: 'striped',
+    headStyles: { fillColor: [63, 81, 181] }, // สีหัวตาราง
+    styles: { fontSize: 10 },
   });
 
-  doc.save(`quotation_${new Date().getTime()}.pdf`);
+  // รวมทั้งหมด
+  doc.text(`รวมทั้งหมด: ${cartTotal.toLocaleString()} บาท`, 14, doc.lastAutoTable.finalY + 10);
+
+  // Save PDF
+  doc.save('quotation.pdf');
 }
+
 
   function resetAdminForm() {
     setNewProduct({ name: '', category: '', sku: '', price: '', stock: '', unit: '', supplier: '' });
@@ -312,4 +308,5 @@ export default function StockStoreApp() {
     </div>
   );
 }
+
 
