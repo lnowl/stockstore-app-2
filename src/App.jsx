@@ -1,8 +1,5 @@
 import React, { useState, useMemo } from 'react';
 import { FaBoxOpen, FaWarehouse, FaExclamationTriangle, FaMoneyBillWave, FaShoppingCart, FaTrash } from 'react-icons/fa';
-import jsPDF from 'jspdf';
-import 'jspdf-autotable';
-
 
 const SAMPLE_PRODUCTS = [
   { id: 1, name: 'ท่อเหล็กกลม 3/4"', category: 'Steel', sku: 'ST-074', price: 420, stock: 120, unit: 'ชิ้น', supplier: 'ABC Steel Co.' },
@@ -39,6 +36,8 @@ export default function StockStoreApp() {
   const totalProducts = products.length;
   const totalStockValue = products.reduce((acc, p) => acc + p.stock * p.price, 0);
 
+  const cartTotal = cart.reduce((acc, c) => acc + c.price * c.qty, 0);
+
   function addToCart(product, qty = 1) {
     setCart(prev => {
       const exists = prev.find(i => i.id === product.id);
@@ -52,43 +51,39 @@ export default function StockStoreApp() {
   }
 
   async function exportQuotation() {
-  if (cart.length === 0) return alert('ไม่มีสินค้าในตะกร้า');
+    if (cart.length === 0) return alert('ไม่มีสินค้าในตะกร้า');
 
-  // dynamic import เพื่อให้ Vite build ผ่าน
-  const { jsPDF } = await import('jspdf');
-  await import('jspdf-autotable');
+    // dynamic import เพื่อ build ผ่าน Vite
+    const { jsPDF } = await import('jspdf');
+    await import('jspdf-autotable');
 
-  const doc = new jsPDF();
-  doc.setFontSize(18);
-  doc.text('ใบเสนอราคา', 14, 20);
+    const doc = new jsPDF();
+    doc.setFontSize(18);
+    doc.text('ใบเสนอราคา', 14, 20);
 
-  // เตรียม data สำหรับ table
-  const tableColumn = ['สินค้า', 'SKU', 'จำนวน', 'หน่วย', 'ราคา/หน่วย', 'รวม'];
-  const tableRows = cart.map(c => [
-    c.name,
-    c.sku,
-    c.qty,
-    c.unit,
-    c.price.toLocaleString(),
-    (c.price * c.qty).toLocaleString()
-  ]);
+    const tableColumn = ['สินค้า', 'SKU', 'จำนวน', 'หน่วย', 'ราคา/หน่วย', 'รวม'];
+    const tableRows = cart.map(c => [
+      c.name,
+      c.sku,
+      c.qty,
+      c.unit,
+      c.price.toLocaleString(),
+      (c.price * c.qty).toLocaleString()
+    ]);
 
-  doc.autoTable({
-    startY: 30,
-    head: [tableColumn],
-    body: tableRows,
-    theme: 'striped',
-    headStyles: { fillColor: [63, 81, 181] }, // สีหัวตาราง
-    styles: { fontSize: 10 },
-  });
+    doc.autoTable({
+      startY: 30,
+      head: [tableColumn],
+      body: tableRows,
+      theme: 'striped',
+      headStyles: { fillColor: [63, 81, 181] },
+      styles: { fontSize: 10 },
+    });
 
-  // รวมทั้งหมด
-  doc.text(`รวมทั้งหมด: ${cartTotal.toLocaleString()} บาท`, 14, doc.lastAutoTable.finalY + 10);
+    doc.text(`รวมทั้งหมด: ${cartTotal.toLocaleString()} บาท`, 14, doc.lastAutoTable.finalY + 10);
 
-  // Save PDF
-  doc.save('quotation.pdf');
-}
-
+    doc.save('quotation.pdf');
+  }
 
   function resetAdminForm() {
     setNewProduct({ name: '', category: '', sku: '', price: '', stock: '', unit: '', supplier: '' });
@@ -145,8 +140,6 @@ export default function StockStoreApp() {
     setShowAdmin(false);
   }
 
-  const cartTotal = cart.reduce((acc, c) => acc + c.price * c.qty, 0);
-
   return (
     <div className="min-h-screen text-gray-200 font-sans" style={{ fontFamily: 'Sarabun, sans-serif', backgroundColor: '#0D1117' }}>
       <div className="max-w-7xl mx-auto p-4">
@@ -157,7 +150,6 @@ export default function StockStoreApp() {
             <h1 className="text-3xl font-bold mb-1">StockStore</h1>
             <p className="text-gray-400 text-sm">จัดการสต๊อก เหล็ก · ท่อ PVC · สายไฟ</p>
           </div>
-
           <div className="flex items-center gap-3 mt-3 md:mt-0">
             <button onClick={() => setShowCart(true)} className="px-3 py-2 bg-purple-600 text-white rounded shadow-sm text-sm hover:bg-purple-500 transition flex items-center gap-2">
               <FaShoppingCart /> ใบเสนอราคา ({cart.length})
@@ -206,7 +198,7 @@ export default function StockStoreApp() {
 
         {/* Filter Section */}
         <div className="flex flex-wrap gap-3 mb-4">
-          <input type="text" value={query} onChange={e => setQuery(e.target.value)} placeholder="ค้นหาสินค้า" className="p-2 rounded  text-white flex-1" style={{ backgroundColor: '#151B23' }} />
+          <input type="text" value={query} onChange={e => setQuery(e.target.value)} placeholder="ค้นหาสินค้า" className="p-2 rounded text-white flex-1" style={{ backgroundColor: '#151B23' }} />
           <select value={category} onChange={e => setCategory(e.target.value)} className="p-2 rounded bg-gray-800 text-white" style={{ backgroundColor: '#151B23' }}>
             {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
           </select>
@@ -274,7 +266,7 @@ export default function StockStoreApp() {
 
                   <div className="flex justify-between items-center mt-4">
                     <p className="text-lg font-bold text-white">รวมทั้งหมด: {cartTotal.toLocaleString()} บาท</p>
-                    <button onClick={exportQuotation} className="px-3 py-2 bg-purple-600 text-white rounded hover:bg-purple-500 transition">Export ใบเสนอราคา</button>
+                    <button onClick={exportQuotation} className="px-3 py-2 bg-purple-600 text-white rounded hover:bg-purple-500 transition">Export ใบเสนอราคา (PDF)</button>
                   </div>
                 </div>
               )}
@@ -293,22 +285,4 @@ export default function StockStoreApp() {
                 <input required placeholder="SKU" value={newProduct.sku} onChange={e => setNewProduct({ ...newProduct, sku: e.target.value })} className="p-2 rounded bg-gray-800 text-white" style={{ backgroundColor: '#151B23' }} />
                 <input required placeholder="ราคา" type="number" value={newProduct.price} onChange={e => setNewProduct({ ...newProduct, price: e.target.value })} className="p-2 rounded bg-gray-800 text-white" style={{ backgroundColor: '#151B23' }} />
                 <input required placeholder="จำนวนคงเหลือ" type="number" value={newProduct.stock} onChange={e => setNewProduct({ ...newProduct, stock: e.target.value })} className="p-2 rounded bg-gray-800 text-white" style={{ backgroundColor: '#151B23' }} />
-                <input required placeholder="หน่วย" value={newProduct.unit} onChange={e => setNewProduct({ ...newProduct, unit: e.target.value })} className="p-2 rounded bg-gray-800 text-white" style={{ backgroundColor: '#151B23' }} />
-                <input required placeholder="ผู้จัดหา" value={newProduct.supplier} onChange={e => setNewProduct({ ...newProduct, supplier: e.target.value })} className="p-2 rounded bg-gray-800 text-white" style={{ backgroundColor: '#151B23' }} />
-
-                <div className="flex gap-2 mt-2">
-                  <button type="submit" className="px-3 py-2 bg-green-600 text-white rounded hover:bg-green-500 transition">บันทึก</button>
-                  <button type="button" onClick={handleCancelAdmin} className="px-3 py-2 bg-gray-600 text-white rounded hover:bg-gray-500 transition">ยกเลิก</button>
-                </div>
-              </form>
-            </div>
-          </div>
-        )}
-
-      </div>
-    </div>
-  );
-}
-
-
-
+                <input required placeholder="หน่วย" value={newProduct.unit} onChange={e => setNewProduct({ ...newProduct, unit: e.target.value
