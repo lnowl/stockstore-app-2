@@ -56,7 +56,6 @@ export default function StockStoreApp() {
     doc.setFontSize(11);
     let startY = 25;
 
-    // Header
     doc.text("สินค้า", 10, startY);
     doc.text("SKU", 60, startY);
     doc.text("จำนวน", 100, startY);
@@ -140,7 +139,6 @@ export default function StockStoreApp() {
   return (
     <div className="min-h-screen text-gray-200 font-sans" style={{ fontFamily: 'Sarabun, sans-serif', backgroundColor: '#0D1117' }}>
       <div className="max-w-7xl mx-auto p-4">
-
         {/* Header */}
         <header className="flex flex-col md:flex-row items-start md:items-center justify-between mb-6">
           <div>
@@ -216,8 +214,9 @@ export default function StockStoreApp() {
               <p className="text-gray-400 text-sm">ผู้จัดหา: {p.supplier}</p>
 
               <div className="flex gap-2 mt-2">
-                <button onClick={() => addToCart(p)} className="px-2 py-1 bg-purple-600 text-white rounded text-sm hover:bg-purple-500 transition">เพิ่มเข้าตะกร้า</button>
-                <button onClick={() => handleEditProduct(p)} className="px-2 py-1 bg-yellow-500 text-white rounded text-sm hover:bg-yellow-400 transition">แก้ไข</button>
+                <button onClick={() => addToCart(p)} className="px-2 py-
+                <button onClick={() => addToCart(p)} className="px-2 py-1 bg-purple-600 text-white rounded text-sm hover:bg-purple-500 transition">เพิ่มไปใบเสนอราคา</button>
+                <button onClick={() => handleEditProduct(p)} className="px-2 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-500 transition">แก้ไข</button>
                 <button onClick={() => handleDeleteProduct(p.id)} className="px-2 py-1 bg-red-600 text-white rounded text-sm hover:bg-red-500 transition">ลบ</button>
               </div>
             </div>
@@ -227,123 +226,71 @@ export default function StockStoreApp() {
         {/* Cart Modal */}
         {showCart && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="p-6 rounded shadow-lg w-full max-w-2xl" style={{ backgroundColor: '#0D1117' }}>
-              <h2 className="text-xl font-bold mb-4 text-white flex justify-between items-center">
-                ใบเสนอราคา
-                <button onClick={() => setShowCart(false)} className="text-gray-400 hover:text-white">✕</button>
-              </h2>
+            <div className="bg-gray-900 p-6 rounded shadow-lg w-full max-w-2xl">
+              <h2 className="text-xl font-bold text-white mb-4">ใบเสนอราคา</h2>
               {cart.length === 0 ? (
-                <p className="text-gray-400">ไม่มีสินค้าในตะกร้า</p>
+                <p className="text-gray-400">ยังไม่มีสินค้าในใบเสนอราคา</p>
               ) : (
-                <div>
-                  <table className="w-full text-sm text-gray-300 mb-4">
-                    <thead>
-                      <tr className="text-left border-b border-gray-700">
-                        <th className="py-2">สินค้า</th>
-                        <th className="py-2">จำนวน</th>
-                        <th className="py-2">ราคา/หน่วย</th>
-                        <th className="py-2">รวม</th>
-                        <th></th>
+                <table className="w-full text-left text-white">
+                  <thead>
+                    <tr>
+                      <th>สินค้า</th>
+                      <th>SKU</th>
+                      <th>จำนวน</th>
+                      <th>ราคา/หน่วย</th>
+                      <th>รวม</th>
+                      <th>ลบ</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {cart.map(item => (
+                      <tr key={item.id}>
+                        <td>{item.name}</td>
+                        <td>{item.sku}</td>
+                        <td>{item.qty}</td>
+                        <td>{item.price.toLocaleString()}</td>
+                        <td>{(item.price * item.qty).toLocaleString()}</td>
+                        <td>
+                          <button onClick={() => removeFromCart(item.id)} className="text-red-500 hover:text-red-400">
+                            <FaTrash />
+                          </button>
+                        </td>
                       </tr>
-                    </thead>
-                    <tbody>
-                      {cart.map(c => (
-                        <tr key={c.id} className="border-b border-gray-700">
-                          <td className="py-2">{c.name}</td>
-                          <td>{c.qty} {c.unit}</td>
-                          <td>{c.price.toLocaleString()} บาท</td>
-                          <td>{(c.price * c.qty).toLocaleString()} บาท</td>
-                          <td>
-                            <button onClick={() => removeFromCart(c.id)} className="text-red-500 hover:text-red-400"><FaTrash /></button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-
-                  <div className="flex justify-between items-center mt-4">
-                    <p className="text-lg font-bold text-white">รวมทั้งหมด: {cartTotal.toLocaleString()} บาท</p>
-                    <button onClick={exportQuotationPDF} className="px-3 py-2 bg-purple-600 text-white rounded hover:bg-purple-500 transition">Export PDF ใบเสนอราคา</button>
-                  </div>
-                </div>
+                    ))}
+                  </tbody>
+                </table>
               )}
+              <div className="mt-4 flex justify-between items-center">
+                <p className="text-white font-bold">รวมทั้งหมด: {cartTotal.toLocaleString()} บาท</p>
+                <div className="flex gap-2">
+                  <button onClick={exportQuotationPDF} className="px-3 py-2 bg-green-600 text-white rounded hover:bg-green-500 transition">Export PDF</button>
+                  <button onClick={() => setShowCart(false)} className="px-3 py-2 bg-gray-700 text-white rounded hover:bg-gray-600 transition">ปิด</button>
+                </div>
+              </div>
             </div>
           </div>
         )}
 
-       {/* Admin Form Modal */}
-{showAdmin && (
-  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div className="p-6 rounded shadow-lg w-full max-w-md" style={{ backgroundColor: '#0D1117' }}>
-      <h2 className="text-xl font-bold mb-4 text-white">{editingProduct ? 'แก้ไขสินค้า' : 'เพิ่มสินค้าใหม่'}</h2>
-      <form onSubmit={handleAddOrUpdateProduct} className="flex flex-col gap-3">
-        <input
-          required
-          placeholder="ชื่อสินค้า"
-          value={newProduct.name}
-          onChange={e => setNewProduct({ ...newProduct, name: e.target.value })}
-          className="p-2 rounded bg-gray-800 text-white"
-          style={{ backgroundColor: '#151B23' }}
-        />
-        <input
-          required
-          placeholder="หมวดหมู่"
-          value={newProduct.category}
-          onChange={e => setNewProduct({ ...newProduct, category: e.target.value })}
-          className="p-2 rounded bg-gray-800 text-white"
-          style={{ backgroundColor: '#151B23' }}
-        />
-        <input
-          required
-          placeholder="SKU"
-          value={newProduct.sku}
-          onChange={e => setNewProduct({ ...newProduct, sku: e.target.value })}
-          className="p-2 rounded bg-gray-800 text-white"
-          style={{ backgroundColor: '#151B23' }}
-        />
-        <input
-          required
-          placeholder="ราคา"
-          type="number"
-          value={newProduct.price}
-          onChange={e => setNewProduct({ ...newProduct, price: e.target.value })}
-          className="p-2 rounded bg-gray-800 text-white"
-          style={{ backgroundColor: '#151B23' }}
-        />
-        <input
-          required
-          placeholder="จำนวนคงเหลือ"
-          type="number"
-          value={newProduct.stock}
-          onChange={e => setNewProduct({ ...newProduct, stock: e.target.value })}
-          className="p-2 rounded bg-gray-800 text-white"
-          style={{ backgroundColor: '#151B23' }}
-        />
-        <input
-          required
-          placeholder="หน่วย"
-          value={newProduct.unit}
-          onChange={e => setNewProduct({ ...newProduct, unit: e.target.value })}
-          className="p-2 rounded bg-gray-800 text-white"
-          style={{ backgroundColor: '#151B23' }}
-        />
-        <input
-          placeholder="ผู้จัดหา"
-          value={newProduct.supplier}
-          onChange={e => setNewProduct({ ...newProduct, supplier: e.target.value })}
-          className="p-2 rounded bg-gray-800 text-white"
-          style={{ backgroundColor: '#151B23' }}
-        />
-
-        <div className="flex gap-2 mt-2">
-          <button type="submit" className="px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-500 transition">
-            {editingProduct ? 'บันทึกการแก้ไข' : 'เพิ่มสินค้า'}
-          </button>
-          <button type="button" onClick={handleCancelAdmin} className="px-3 py-2 bg-gray-600 text-white rounded hover:bg-gray-500 transition">
-            ยกเลิก
-          </button>
-        </div>
-      </form>
+        {/* Admin Form */}
+        {showAdmin && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <form onSubmit={handleAddOrUpdateProduct} className="bg-gray-900 p-6 rounded shadow-lg w-full max-w-md space-y-3 text-white">
+              <h2 className="text-xl font-bold">{editingProduct ? 'แก้ไขสินค้า' : 'เพิ่มสินค้า'}</h2>
+              <input type="text" placeholder="ชื่อสินค้า" value={newProduct.name} onChange={e => setNewProduct({...newProduct, name: e.target.value})} className="w-full p-2 rounded bg-gray-800" required />
+              <input type="text" placeholder="หมวดหมู่" value={newProduct.category} onChange={e => setNewProduct({...newProduct, category: e.target.value})} className="w-full p-2 rounded bg-gray-800" required />
+              <input type="text" placeholder="SKU" value={newProduct.sku} onChange={e => setNewProduct({...newProduct, sku: e.target.value})} className="w-full p-2 rounded bg-gray-800" required />
+              <input type="number" placeholder="ราคา" value={newProduct.price} onChange={e => setNewProduct({...newProduct, price: e.target.value})} className="w-full p-2 rounded bg-gray-800" required />
+              <input type="number" placeholder="สต๊อก" value={newProduct.stock} onChange={e => setNewProduct({...newProduct, stock: e.target.value})} className="w-full p-2 rounded bg-gray-800" required />
+              <input type="text" placeholder="หน่วย" value={newProduct.unit} onChange={e => setNewProduct({...newProduct, unit: e.target.value})} className="w-full p-2 rounded bg-gray-800" required />
+              <input type="text" placeholder="ผู้จัดหา" value={newProduct.supplier} onChange={e => setNewProduct({...newProduct, supplier: e.target.value})} className="w-full p-2 rounded bg-gray-800" required />
+              <div className="flex justify-end gap-2 mt-2">
+                <button type="submit" className="px-3 py-2 bg-blue-600 rounded hover:bg-blue-500">{editingProduct ? 'บันทึก' : 'เพิ่ม'}</button>
+                <button type="button" onClick={handleCancelAdmin} className="px-3 py-2 bg-gray-700 rounded hover:bg-gray-600">ยกเลิก</button>
+              </div>
+            </form>
+          </div>
+        )}
+      </div>
     </div>
-  </div>
-)}
+  );
+}
